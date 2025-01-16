@@ -1,5 +1,6 @@
 import json
 import csv
+import argparse
 
 
 def extract_bug_cards(trello_json_path: str, output_csv_path: str):
@@ -64,4 +65,11 @@ def extract_bug_cards(trello_json_path: str, output_csv_path: str):
 
 
 if __name__ == "__main__":
-    extract_bug_cards("mavis-trello-board.json", "out/bugs.csv")
+    parser = argparse.ArgumentParser(
+        description="Extract bug cards from Trello board JSON export"
+    )
+    parser.add_argument("input", help="Path to the Trello board JSON file")
+    parser.add_argument("output", help="Path where the output CSV should be saved")
+
+    args = parser.parse_args()
+    extract_bug_cards(args.input, args.output)
