@@ -1,6 +1,28 @@
 import json
 import csv
 import argparse
+from markdown_it import MarkdownIt
+
+
+def get_section_content(markdown_text: str, header_name: str) -> str:
+    md = MarkdownIt()
+    tokens = md.parse(markdown_text)
+
+    content = []
+    under_header = False
+
+    for i, token in enumerate(tokens):
+        if token.type == 'heading_open':
+            header_text = tokens[i + 1].content
+            if header_name.lower() in header_text.strip().lower():
+                under_header = True
+                continue
+            elif under_header:
+                break
+        elif under_header and token.type == 'inline':
+            content.append(token.content)
+
+    return '\n'.join(content[1:]).strip()
 
 
 def extract_bug_cards(trello_json_path: str, output_csv_path: str):
@@ -44,11 +66,18 @@ def extract_bug_cards(trello_json_path: str, output_csv_path: str):
                     option_id = custom_field_item.get("idValue")
                     severity = severity_options.get(option_id, "Not set")
 
+            # Extract content
+            description = card.get("desc", "")
+            workaround = get_section_content(description, "workaround")
+            servicenow = get_section_content(description, "servicenow")
+
             bug_cards.append(
                 {
                     "id": card.get("idShort", ""),
                     "name": card.get("name", ""),
-                    "description": card.get("desc", ""),
+                    "description": description,
+                    "workaround": workaround,
+                    "servicenow": servicenow,
                     "severity": severity,
                     "list": list_names.get(card.get("idList"), "Unknown"),
                     "url": card.get("shortUrl", ""),
@@ -58,7 +87,7 @@ def extract_bug_cards(trello_json_path: str, output_csv_path: str):
     # Write to CSV
     with open(output_csv_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
-            f, fieldnames=["id", "name", "description", "severity", "list", "url"]
+            f, fieldnames=["id", "name", "description", "workaround", "servicenow", "severity", "list", "url"]
         )
         writer.writeheader()
         writer.writerows(bug_cards)

@@ -1,2 +1,7 @@
 *.json
 *.csv
+
+.idea
+.venv
+
+mise*
