@@ -5,3 +5,6 @@
 .venv
 
 mise*
+
+.env
+__pycache__
