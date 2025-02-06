@@ -16,6 +16,7 @@ def create_jira_csv(output_csv_path: str):
     cards = []
     for card in all_original_cards:
         labels = [label.get("name", "").lower() for label in card.get("labels", [])]
+        labels = utils.filter_labels(labels)
         description = card.get("desc", "")
         members = [utils.get_member_short_code(member_id) for member_id in card.get("idMembers", [])] # Need to map these to names or shortcodes
         checklists = utils.get_card_checklists(card.get("id"))

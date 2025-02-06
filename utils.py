@@ -119,6 +119,17 @@ def get_list_name(list_id: str) -> str:
             return column.get("name", "No name")
     return "Not found"
 
+def filter_labels(labels: list[str]) -> list[str]:
+    jira_labels = []
+
+    for label in labels:
+        if label.lower() in JIRA_LABELS_LOWER:
+            jira_labels.append(JIRA_LABELS[JIRA_LABELS_LOWER.index(label.lower())])
+
+    return jira_labels
+
+
+
 
 ALL_CUSTOM_FIELDS = get_all_custom_fields()
 ALL_MEMBERS = get_all_members()
@@ -127,6 +138,9 @@ with open('members_mapping.json', 'r') as f:
 ALL_LISTS = get_all_lists()
 with open('columns_mapping.json', 'r') as f:
     COLUMNS_MAPPING = json.load(f)
+with open('jira_labels.json', 'r') as f:
+    JIRA_LABELS = json.load(f)
+    JIRA_LABELS_LOWER = [label.lower() for label in JIRA_LABELS]
 
 # def extract_cards_since(cards: list[Card], start_date: datetime) -> list[Card]:
 #     return [
@@ -163,9 +177,6 @@ with open('columns_mapping.json', 'r') as f:
 #
 # def extract_archived_cards(cards: list[Card], is_archived: bool=False) -> list[Card]:
 #     return [card for card in cards if card.closed == is_archived]
-#
-
-#
 #
 # def get_custom_field_options_map(custom_field) -> dict[str, str]:
 #     data = make_api_request(url_extension=f"customFields/{custom_field.get("idCustomField")}/options")

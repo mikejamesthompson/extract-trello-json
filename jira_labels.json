@@ -1,0 +1,30 @@
+[
+  "Dev",
+  "Bug",
+  "Design",
+  "Ops",
+  "Assurance",
+  "Incident",
+  "Waiting", // Refactor to "blocked"
+  "Blocked",
+  "v1.1.0",
+  "v1.1.1",
+  "v1.1.2",
+  "v1.2.0",
+  "v1.3.0",
+  "v1.4.0",
+  "v1.5.0",
+  "Research",
+  "Devops",
+  "Doubles",
+  "Needs design input",
+  "Ops support",
+  "Onboarding",
+  "Feature",
+  "Architecture",
+  "herts", // Refactor to "Hertfordshire"
+  "Hertfordshire",
+  "Leicestershire",
+  "C&W",
+  "Clinical"
+]

@@ -1,5 +1,7 @@
 *.json
 !columns_mapping.json
+!jira_labels.json
+
 *.csv
 
 .idea
