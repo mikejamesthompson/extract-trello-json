@@ -1,4 +1,5 @@
 *.json
+!columns_mapping.json
 *.csv
 
 .idea

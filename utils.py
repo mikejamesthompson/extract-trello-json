@@ -2,6 +2,7 @@ from markdown_it import MarkdownIt
 import os
 import dotenv
 import requests
+import json
 
 dotenv.load_dotenv()
 
@@ -56,6 +57,15 @@ def get_all_cards():
 def get_all_members():
     return make_api_request(f"board/{os.getenv('TRELLO_BOARD_ID')}/members")
 
+def get_member_name(member_id: str) -> str:
+    for member in ALL_MEMBERS:
+        if member['id'] == member_id:
+            return member['fullName']
+    return "Not found"
+
+def get_member_short_code(member_id: str) -> str:
+    return MEMBERS_MAPPING.get(member_id, "Not found")
+
 def get_card_creator(card_id: str):
     result = make_api_request(f"board/{os.getenv('TRELLO_BOARD_ID')}/actions", {
         "filter": "createCard",
@@ -95,10 +105,28 @@ def get_card_custom_fields(card_id) -> dict[str, str]:
 def get_card_checklists(card_id: str):
     return make_api_request(f"card/{card_id}/checklists")
 
+def get_card_comments(card_id: str):
+    return make_api_request(f"card/{card_id}/actions", {
+        "filter": "commentCard"
+    })
+
+def get_all_lists():
+    return make_api_request(f"boards/{os.getenv('TRELLO_BOARD_ID')}/lists")
+
+def get_list_name(list_id: str) -> str:
+    for column in ALL_LISTS:
+        if column.get("id", "") == list_id:
+            return column.get("name", "No name")
+    return "Not found"
+
 
 ALL_CUSTOM_FIELDS = get_all_custom_fields()
 ALL_MEMBERS = get_all_members()
-
+with open('members_mapping.json', 'r') as f:
+    MEMBERS_MAPPING = json.load(f)
+ALL_LISTS = get_all_lists()
+with open('columns_mapping.json', 'r') as f:
+    COLUMNS_MAPPING = json.load(f)
 
 # def extract_cards_since(cards: list[Card], start_date: datetime) -> list[Card]:
 #     return [
