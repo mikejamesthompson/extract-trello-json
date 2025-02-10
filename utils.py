@@ -113,13 +113,19 @@ def get_card_comments(card_id: str):
     })
 
 def process_comments(comments):
-    return [
-        {
-            "creator": get_member_short_code(comment.get("idMemberCreator")),
-            "creation_time": comment.get("date"),
-            "text": comment.get("data", {}).get("text", "Not found"),
-        } for comment in comments
-    ]
+    formatted_comments = []
+
+    for comment in comments:
+        date = comment.get("date")
+        date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
+        date = date.replace(microsecond=0)
+        date = date.isoformat()
+        member_id = get_member_short_code(comment.get("idMemberCreator"))
+        text = comment.get("data", {}).get("text", "Not found")
+
+        formatted_comments.append(f"{date};{member_id};{text}")
+
+    return formatted_comments
 
 def get_all_lists():
     return make_api_request(f"boards/{os.getenv('TRELLO_BOARD_ID')}/lists")
@@ -159,8 +165,7 @@ def get_attachment_data(attachment_url: str):
     return response
 
 def get_time_from_id(card_id: str):
-    creation_time = datetime.fromtimestamp(int(card_id[0:8], 16))
-    return pytz.utc.localize(creation_time)
+    return datetime.fromtimestamp(int(card_id[0:8], 16))
 
 
 
