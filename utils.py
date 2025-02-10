@@ -152,8 +152,10 @@ def filter_labels(labels: list[str]) -> list[str]:
 
     return jira_labels
 
-def get_card_attachments(card_id: str):
-    return make_api_request(f"card/{card_id}/attachments")
+def get_card_attachment_urls(card_id: str):
+    attachments = make_api_request(f"card/{card_id}/attachments")
+    # [print(type(attachment)) for attachment in attachments]
+    return [attachment.get("url") for attachment in attachments]
 
 def get_attachment_data(attachment_url: str):
     auth_header = {

@@ -26,8 +26,8 @@ def create_jira_csv(output_csv_path: str):
         comments = utils.get_card_comments(card.get("id"))
         comments = utils.process_comments(comments)
         column = utils.get_list_name(card.get("idList"))
-        attachments = utils.get_card_attachments(card.get("id"))
-        attachments_contents = [utils.get_attachment_data(attachment.get("url")) for attachment in attachments]
+        attachments = utils.get_card_attachment_urls(card.get("id"))
+        attachments_contents = [utils.get_attachment_data(attachment) for attachment in attachments]
         creation_time = utils.get_time_from_id(card.get("id"))
 
         if "bug" in labels:
@@ -52,7 +52,7 @@ def create_jira_csv(output_csv_path: str):
                 "creation_time": creation_time.isoformat(),
                 "status": utils.get_jira_list_name(column, issue_type),
                 "comments": comments,
-                "attachments": [attachment.get("url") for attachment in attachments],
+                "attachments": attachments,
             }
         )
 
