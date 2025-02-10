@@ -1,9 +1,7 @@
-import json
-import csv
 import argparse
-from pytz import all_timezones
 import utils
 import pandas as pd
+from tqdm import tqdm
 
 
 def create_jira_csv(output_csv_path: str):
@@ -14,7 +12,9 @@ def create_jira_csv(output_csv_path: str):
 
     # Extract bug cards
     cards = []
-    for card in all_original_cards:
+    for card in tqdm(all_original_cards):
+        tqdm.write(f"Processing card: MAVIS-{card.get("idShort", "")} - {card.get("name", "")}")
+
         labels = [label.get("name", "").lower() for label in card.get("labels", [])]
         description = card.get("desc", "")
         members = [utils.get_member_short_code(member_id) for member_id in card.get("idMembers", [])] # Need to map these to names or shortcodes
@@ -42,7 +42,8 @@ def create_jira_csv(output_csv_path: str):
                 "name": card.get("name", ""),
                 "description": description,
                 "severity": custom_fields.get("Severity", ""),
-                "members": members,
+                "assignee": members[0] if len(members) > 0 else "",
+                "collaborators": members[1:],
                 "trello_id": trello_id, # TODO maybe make this a link instead?
                 "workaround": workaround,
                 "issue_type": issue_type,
@@ -80,7 +81,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Extract bug cards from Trello board JSON export"
     )
-    parser.add_argument("output", help="Path where the output CSV should be saved")
+    parser.add_argument("--output", help="Path where the output CSV should be saved", default="output.csv")
 
     args = parser.parse_args()
     create_jira_csv(args.output)
