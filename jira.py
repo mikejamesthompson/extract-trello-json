@@ -10,13 +10,12 @@ def create_jira_csv(output_csv_path: str):
     # Read the Trello JSON file
     all_original_cards = utils.get_all_cards()
 
-    all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [1993, 1992, 1995, 1978]]
+    all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [1992, 1995, 1978, 1842, 1993, 1891]]
 
     # Extract bug cards
     cards = []
     for card in all_original_cards:
         labels = [label.get("name", "").lower() for label in card.get("labels", [])]
-        labels = utils.filter_labels(labels)
         description = card.get("desc", "")
         members = [utils.get_member_short_code(member_id) for member_id in card.get("idMembers", [])] # Need to map these to names or shortcodes
         checklists = utils.get_card_checklists(card.get("id"))
@@ -25,11 +24,11 @@ def create_jira_csv(output_csv_path: str):
         custom_fields = utils.get_card_custom_fields(card.get("id"))
         workaround = utils.get_section_content_from_markdown(description, "workaround")
         comments = utils.get_card_comments(card.get("id"))
-        list = utils.get_list_name(card.get("idList"))
-        # TODO Attachments
-        # TODO Description formatting
-        # TODO Card column
-        # TODO Find something to do with Feature
+        comments = utils.process_comments(comments)
+        column = utils.get_list_name(card.get("idList"))
+        attachments = utils.get_card_attachments(card.get("id"))
+        attachments_contents = [utils.get_attachment_data(attachment.get("url")) for attachment in attachments]
+        creation_time = utils.get_time_from_id(card.get("id"))
 
         if "bug" in labels:
             issue_type = "Bugs"
@@ -47,8 +46,12 @@ def create_jira_csv(output_csv_path: str):
                 "trello_id": trello_id, # TODO maybe make this a link instead?
                 "workaround": workaround,
                 "issue_type": issue_type,
-                # "labels": labels,
-                "creator": creator
+                "labels": utils.filter_labels(labels), # TODO Refactor cards in trello: waiting -> blocked, herts -> Hertfordshire
+                "creator": creator,
+                "creation_time": creation_time.isoformat(),
+                "status": utils.get_jira_list_name(column, issue_type),
+                "comments": comments,
+                "attachments": [attachment.get("url") for attachment in attachments],
             }
         )
 

@@ -13,6 +13,9 @@
     "members" : {
       "existing.custom.field" : "15913"
     },
+    "issue_type" : {
+      "jira.field" : "issuetype"
+    },
     "name" : {
       "jira.field" : "summary"
     },
@@ -24,6 +27,9 @@
     },
     "workaround" : {
       "existing.custom.field" : "10564"
+    },
+    "labels" : {
+      "jira.field" : "labels"
     }
   },
   "config.value.mappings" : { },

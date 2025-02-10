@@ -3,6 +3,8 @@ import os
 import dotenv
 import requests
 import json
+from datetime import datetime
+import pytz
 
 dotenv.load_dotenv()
 
@@ -110,6 +112,15 @@ def get_card_comments(card_id: str):
         "filter": "commentCard"
     })
 
+def process_comments(comments):
+    return [
+        {
+            "creator": get_member_short_code(comment.get("idMemberCreator")),
+            "creation_time": comment.get("date"),
+            "text": comment.get("data", {}).get("text", "Not found"),
+        } for comment in comments
+    ]
+
 def get_all_lists():
     return make_api_request(f"boards/{os.getenv('TRELLO_BOARD_ID')}/lists")
 
@@ -119,6 +130,10 @@ def get_list_name(list_id: str) -> str:
             return column.get("name", "No name")
     return "Not found"
 
+def get_jira_list_name(list_name: str, issue_type: str) -> str:
+    default = COLUMNS_MAPPING.get("default_column", {}).get(issue_type, "Not found")
+    return COLUMNS_MAPPING.get(list_name, {}).get(issue_type, default)
+
 def filter_labels(labels: list[str]) -> list[str]:
     jira_labels = []
 
@@ -126,8 +141,26 @@ def filter_labels(labels: list[str]) -> list[str]:
         if label.lower() in JIRA_LABELS_LOWER:
             jira_labels.append(JIRA_LABELS[JIRA_LABELS_LOWER.index(label.lower())])
 
+    # Replace all spaces with dashes - Jira doesn't support spaces in labels
+    jira_labels = [label.replace(" ", "-") for label in jira_labels]
+
     return jira_labels
 
+def get_card_attachments(card_id: str):
+    return make_api_request(f"card/{card_id}/attachments")
+
+def get_attachment_data(attachment_url: str):
+    auth_header = {
+        "Authorization": f"OAuth oauth_consumer_key=\"{os.getenv('TRELLO_API_KEY')}\", oauth_token=\"{os.getenv('TRELLO_TOKEN')}\""
+    }
+    response = requests.get(attachment_url, headers=auth_header)
+    response.raise_for_status()
+
+    return response
+
+def get_time_from_id(card_id: str):
+    creation_time = datetime.fromtimestamp(int(card_id[0:8], 16))
+    return pytz.utc.localize(creation_time)
 
 
 
