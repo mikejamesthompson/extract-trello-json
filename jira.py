@@ -8,7 +8,7 @@ def create_jira_csv(output_csv_path: str):
     # Read the Trello JSON file
     all_original_cards = utils.get_all_cards()
 
-    all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [1992, 1995, 1978, 1842, 1993, 1891]]
+    all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [1992, 1995, 1978, 1842, 1993, 1891, 1781]]
 
     # Extract bug cards
     cards = []
@@ -37,6 +37,11 @@ def create_jira_csv(output_csv_path: str):
         else:
             issue_type = "Stories"
 
+        version = ""
+        for label in labels:
+            if label.startswith("v1."):
+                version = label
+
         cards.append(
             {
                 "name": card.get("name", ""),
@@ -53,6 +58,7 @@ def create_jira_csv(output_csv_path: str):
                 "status": utils.get_jira_list_name(column, issue_type),
                 "comments": comments,
                 "attachments": attachments,
+                "fix_version": version,
             }
         )
 
