@@ -19,6 +19,7 @@ def create_jira_csv(output_csv_path: str):
         description = card.get("desc", "")
         members = [utils.get_member_short_code(member_id) for member_id in card.get("idMembers", [])] # Need to map these to names or shortcodes
         checklists = utils.get_card_checklists(card.get("id"))
+        checklist_items = utils.process_checklists(checklists)
         trello_id = card.get("idShort", "")
         creator = utils.get_member_short_code(utils.get_card_creator(card.get("id")).get("id"))
         custom_fields = utils.get_card_custom_fields(card.get("id"))
@@ -27,7 +28,7 @@ def create_jira_csv(output_csv_path: str):
         comments = utils.process_comments(comments)
         column = utils.get_list_name(card.get("idList"))
         attachments = utils.get_card_attachment_urls(card.get("id"))
-        attachments_contents = [utils.get_attachment_data(attachment) for attachment in attachments]
+        # attachments_contents = [utils.get_attachment_data(attachment) for attachment in attachments]
         creation_time = utils.get_time_from_id(card.get("id"))
 
         if "bug" in labels:
@@ -59,6 +60,7 @@ def create_jira_csv(output_csv_path: str):
                 "comments": comments,
                 "attachments": attachments,
                 "fix_version": version,
+                "checklist_items": checklist_items,
             }
         )
 

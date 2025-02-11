@@ -107,6 +107,21 @@ def get_card_custom_fields(card_id) -> dict[str, str]:
 def get_card_checklists(card_id: str):
     return make_api_request(f"card/{card_id}/checklists")
 
+def process_checklists(checklists):
+    checklist_items = []
+
+    for checklist in checklists:
+        for item in checklist.get("checkItems", []):
+            checklist_items.append({
+                "checked": item.get("state", "") == "complete",
+                "name": item.get("name", "Not found"),
+            })
+
+            # if not item.get("due") is None: checklist_items[-1]["dueDate"] = item.get("due")
+            if not item.get("idMember") is None: checklist_items[-1]["assigneeIds"] = [get_member_short_code(item.get("idMember"))]
+
+    return [json.dumps(item) for item in checklist_items]
+
 def get_card_comments(card_id: str):
     return make_api_request(f"card/{card_id}/actions", {
         "filter": "commentCard"
