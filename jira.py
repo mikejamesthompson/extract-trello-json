@@ -31,11 +31,11 @@ def create_jira_csv(output_csv_path: str):
         creation_time = utils.get_time_from_id(card.get("id"))
 
         if "bug" in labels:
-            issue_type = "Bugs"
+            issue_type = "Bug"
         elif "ops" in labels or "ops support" in labels:
             issue_type = "Support"
         else:
-            issue_type = "Stories"
+            issue_type = "Story"
 
         version = ""
         for label in labels:
@@ -44,7 +44,7 @@ def create_jira_csv(output_csv_path: str):
 
         cards.append(
             {
-                "name": card.get("name", ""),
+                "summary": "TEST MIGRATION: " + card.get("name", ""),
                 "description": description,
                 "severity": custom_fields.get("Severity", ""),
                 "assignee": members[0] if len(members) > 0 else "",
@@ -53,8 +53,8 @@ def create_jira_csv(output_csv_path: str):
                 "workaround": workaround,
                 "issue_type": issue_type,
                 "labels": utils.filter_labels(labels), # TODO Refactor cards in trello: waiting -> blocked, herts -> Hertfordshire
-                "creator": creator,
-                "creation_time": creation_time.isoformat(),
+                "reporter": creator,
+                "date_created": creation_time.isoformat(),
                 "status": utils.get_jira_list_name(column, issue_type),
                 "comments": comments,
                 "attachments": attachments,
