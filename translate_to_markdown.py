@@ -1,4 +1,5 @@
 import re
+import emoji  # pip install emoji
 
 
 def md_to_jira(md: str) -> str:
@@ -16,7 +17,8 @@ def md_to_jira(md: str) -> str:
       • Images (![alt](url) -> !url|alt=alt!)
       • Horizontal rules (--- -> ----)
       • Strikethrough (~~text~~ -> -text-)
-      • Nested lists (ordered and unordered) with dynamic indentation.
+      • Nested lists (both ordered and unordered) with dynamic indentation.
+      • Emojis: convert colon-based emoji aliases (e.g. :white_check_mark:) to Unicode emojis.
 
     Raises:
       ValueError: If tables are detected in the Markdown.
@@ -60,9 +62,9 @@ def md_to_jira(md: str) -> str:
     text = re.sub(r"`(.*?)`", r"{{\1}}", text)
 
     # --- Handle blockquotes ---
-    # First, remove blockquote markers on blank lines (lines that only contain ">" and optionally whitespace).
+    # Remove blockquote markers on blank lines.
     text = re.sub(r"^>\s*$", "", text, flags=re.MULTILINE)
-    # Now convert non-blank blockquote lines.
+    # Convert non-blank blockquote lines.
     text = re.sub(r"^>\s+", "bq. ", text, flags=re.MULTILINE)
 
     # Convert images: Markdown !alt -> Jira !url|alt=alt!
@@ -77,8 +79,7 @@ def md_to_jira(md: str) -> str:
     # Convert strikethroughs: Markdown ~~text~~ -> Jira -text-
     text = re.sub(r"~~(.*?)~~", r"-\1-", text)
 
-    # --- Nested list processing ---
-    # Define regex patterns for ordered and unordered items.
+    # --- Nested list processing (ordered & unordered) ---
     unordered_pattern = re.compile(r"^(?P<indent>\s*)[-*]\s+(?P<content>.*)$")
     ordered_pattern = re.compile(r"^(?P<indent>\s*)(?P<num>\d+\.)\s+(?P<content>.*)$")
 
@@ -129,6 +130,9 @@ def md_to_jira(md: str) -> str:
 
     text = convert_list_lines(text)
 
+    # This will replace occurrences like :white_check_mark: with the corresponding emoji.
+    text = emoji.emojize(text, language="alias")
+
     return text
 
 
@@ -138,14 +142,14 @@ if __name__ == "__main__":
 Some **bold text** and some *italic text* along with ~~strikethrough~~ formatting.
 
 ## Heading 2
-A paragraph with a [link](https://example.com) and inline code: `x = 1`.
+A paragraph with a [link](https://example.com) and inline code: `x = 1`. :smile:
 
 > childs form is not coming through and she is not appearing on any cohort. Do they just have to wait a bit and maybe catch her on the next session?
 >
 > Manage vaccinations in schools (Mavis) – Manage vaccinations in schools
 
 - Top-level unordered item
- - Nested unordered item
+   - Nested unordered item
         - Third-level unordered item
 * Another top-level unordered item
 
