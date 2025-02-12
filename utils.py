@@ -290,9 +290,6 @@ with open('jira_labels.json', 'r') as f:
 #
 #     return extract_cards_with_labels(cards, labels, match_function=lambda booleans: not match_function(booleans))
 #
-# def extract_archived_cards(cards: list[Card], is_archived: bool=False) -> list[Card]:
-#     return [card for card in cards if card.closed == is_archived]
-#
 # def get_custom_field_options_map(custom_field) -> dict[str, str]:
 #     data = make_api_request(url_extension=f"customFields/{custom_field.get("idCustomField")}/options")
 #

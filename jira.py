@@ -1,16 +1,18 @@
 import argparse
 import utils
 from tqdm import tqdm
+from translate_to_markdown import md_to_jira
 
 
 def create_jira_csv(output_csv_path: str):
     # Read the Trello JSON file
     all_original_cards = utils.get_all_cards()
 
-    all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [1992, 1995, 1978, 1842, 1993, 1891, 1781]]
     # Exclude archived cards
     all_original_cards = [card for card in all_original_cards if card.get("closed") == False]
 
+    # all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [1933]]#, 1947, 1293, 1992, 1995, 1978, 1842, 1993, 1891, 1781]]
+    # all_original_cards = all_original_cards[:100]
 
     # Extract bug cards
     cards = []
@@ -19,6 +21,7 @@ def create_jira_csv(output_csv_path: str):
 
         labels = [label.get("name", "").lower() for label in card.get("labels", [])]
         description = card.get("desc", "")
+        description = md_to_jira(description)
         members = [utils.get_member_short_code(member_id) for member_id in card.get("idMembers", [])] # Need to map these to names or shortcodes
         checklists = utils.get_card_checklists(card.get("id"))
         checklist_items = utils.process_checklists(checklists)
