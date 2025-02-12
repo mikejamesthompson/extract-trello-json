@@ -21,7 +21,7 @@ def create_jira_csv(output_csv_path: str):
         checklists = utils.get_card_checklists(card.get("id"))
         checklist_items = utils.process_checklists(checklists)
         trello_id = card.get("idShort", "")
-        creator = utils.get_member_short_code(utils.get_card_creator(card.get("id")).get("id"))
+        creator = utils.get_member_short_code(utils.get_card_creator(card.get("id")).get("id", ""))
         custom_fields = utils.get_card_custom_fields(card.get("id"))
         workaround = utils.get_section_content_from_markdown(description, "workaround")
         comments = utils.get_card_comments(card.get("id"))

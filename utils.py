@@ -4,7 +4,6 @@ import dotenv
 import requests
 import json
 from datetime import datetime
-import pytz
 
 dotenv.load_dotenv()
 
@@ -66,7 +65,7 @@ def get_member_name(member_id: str) -> str:
     return "Not found"
 
 def get_member_short_code(member_id: str) -> str:
-    return MEMBERS_MAPPING.get(member_id, "Not found")
+    return MEMBERS_MAPPING.get(member_id, "")
 
 def get_card_creator(card_id: str):
     result = make_api_request(f"board/{os.getenv('TRELLO_BOARD_ID')}/actions", {
@@ -75,8 +74,15 @@ def get_card_creator(card_id: str):
         "idModels": card_id
     })
 
+    if len(result) == 0: # No creator; check if the card was created by a copy action
+        result = make_api_request(f"board/{os.getenv('TRELLO_BOARD_ID')}/actions", {
+            "filter": "copyCard",
+            "fields": "idMemberCreator",
+            "idModels": card_id
+        })
+
     if len(result) == 0: # Creator is no longer a member of the board
-        return None
+        return {}
 
     return result[0]["memberCreator"]
 
