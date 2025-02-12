@@ -12,15 +12,15 @@ def create_jira_csv(output_csv_path: str):
     all_original_cards = [card for card in all_original_cards if card.get("closed") == False]
 
     # Restrict cards for testing
-    all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [
-        1293, # No creator (otherwise also complex), v1.5.0, emojis
-        1851, # Good markdown
-        1933, # Links instead of attachments
-        1992, # In done column, ops support
-        1995, # Archived
-        1891, # Go-live for Herts - checklist
-        1792, # Markdown in comments
-    ]]
+    # all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [
+    #     1293, # No creator (otherwise also complex), v1.5.0, emojis
+    #     1851, # Good markdown
+    #     1933, # Links instead of attachments
+    #     1992, # In done column, ops support
+    #     1995, # Archived
+    #     1891, # Go-live for Herts - checklist
+    #     1792, # Markdown in comments
+    # ]]
     # all_original_cards = all_original_cards[:100]
 
     # Extract bug cards
