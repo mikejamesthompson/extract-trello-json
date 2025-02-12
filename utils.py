@@ -5,6 +5,7 @@ import requests
 import json
 from datetime import datetime
 import pandas as pd
+from translate_to_markdown import md_to_jira
 
 dotenv.load_dotenv()
 
@@ -152,6 +153,7 @@ def process_comments(comments):
         date = date.isoformat()
         member_id = get_member_short_code(comment.get("idMemberCreator"))
         text = comment.get("data", {}).get("text", "Not found")
+        text = md_to_jira(text)
 
         formatted_comments.append(f"{date};{member_id};{text}")
 
