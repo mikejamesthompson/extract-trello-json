@@ -27,9 +27,10 @@ def create_jira_csv(output_csv_path: str):
         comments = utils.get_card_comments(card.get("id"))
         comments = utils.process_comments(comments)
         column = utils.get_list_name(card.get("idList"))
-        attachments = utils.get_card_attachment_urls(card.get("id"))
-        # attachments_contents = [utils.get_attachment_data(attachment) for attachment in attachments]
         creation_time = utils.get_time_from_id(card.get("id"))
+
+        trello_attachments = utils.get_card_attachment_urls(card.get("id"))
+        attachments_local_urls = [utils.save_attachment(attachment) for attachment in trello_attachments]
 
         if "bug" in labels:
             issue_type = "Bug"
@@ -45,12 +46,12 @@ def create_jira_csv(output_csv_path: str):
 
         cards.append(
             {
-                "summary": "TEST MIGRATION: " + card.get("name", ""),
+                "summary": card.get("name", ""),
                 "description": description,
                 "severity": custom_fields.get("Severity", ""),
                 "assignee": members[0] if len(members) > 0 else "",
                 "collaborators": members[1:],
-                "trello_id": trello_id, # TODO maybe make this a link instead?
+                "trello_id": trello_id,
                 "workaround": workaround,
                 "issue_type": issue_type,
                 "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"], # TODO Refactor cards in trello: waiting -> blocked, herts -> Hertfordshire
@@ -58,7 +59,7 @@ def create_jira_csv(output_csv_path: str):
                 "date_created": creation_time.isoformat(),
                 "status": utils.get_jira_list_name(column, issue_type), # TODO check that these aren't spitting out "Not found"
                 "comments": comments,
-                "attachments": attachments,
+                "attachments": attachments_local_urls,
                 "fix_version": version,
                 "checklist_items": checklist_items,
             }

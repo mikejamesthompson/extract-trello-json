@@ -187,7 +187,22 @@ def get_attachment_data(attachment_url: str):
     response = requests.get(attachment_url, headers=auth_header)
     response.raise_for_status()
 
-    return response
+    return response.content
+
+def save_attachment(attachment_url: str):
+    local_endpoint = attachment_url.removeprefix("https://trello.com/1/").replace("/", "-")
+    file_location = os.path.join(os.getenv("ATTACHMENT_DIRECTORY"), local_endpoint)
+
+    # Ensure the attachments directory exists.
+    os.makedirs(os.getenv("ATTACHMENT_DIRECTORY"), exist_ok=True)
+    
+    image_data = get_attachment_data(attachment_url)
+
+    with open(file_location, "wb") as f:
+        f.write(image_data)
+    print(f"Saved attachment to {file_location}")
+
+    return os.path.join(os.getenv('ATTACHMENT_SERVER_ENDPOINT'), local_endpoint)
 
 def get_time_from_id(card_id: str):
     return datetime.fromtimestamp(int(card_id[0:8], 16))
