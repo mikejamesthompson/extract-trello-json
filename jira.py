@@ -39,6 +39,8 @@ def create_jira_csv(output_csv_path: str):
         else:
             issue_type = "Story"
 
+        status = utils.get_jira_list_name(column, issue_type)
+
         version = ""
         for label in labels:
             if label.startswith("v1."):
@@ -57,7 +59,7 @@ def create_jira_csv(output_csv_path: str):
                 "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"], # TODO Refactor cards in trello: waiting -> blocked, herts -> Hertfordshire
                 "reporter": creator,
                 "date_created": creation_time.isoformat(),
-                "status": utils.get_jira_list_name(column, issue_type), # TODO check that these aren't spitting out "Not found"
+                "status": status,
                 "comments": comments,
                 "attachments": attachments_local_urls,
                 "fix_version": version,
