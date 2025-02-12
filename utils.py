@@ -108,19 +108,27 @@ def get_card_checklists(card_id: str):
     return make_api_request(f"card/{card_id}/checklists")
 
 def process_checklists(checklists):
-    checklist_items = []
+    checklist_items = ""
 
     for checklist in checklists:
-        for item in checklist.get("checkItems", []):
-            checklist_items.append({
-                "checked": item.get("state", "") == "complete",
-                "name": item.get("name", "Not found"),
-            })
+        sorted_items = sorted(checklist.get("checkItems", []), key=lambda i: i["pos"])
 
-            # if not item.get("due") is None: checklist_items[-1]["dueDate"] = item.get("due")
-            if not item.get("idMember") is None: checklist_items[-1]["assigneeIds"] = [get_member_short_code(item.get("idMember"))]
+        for item in sorted_items:
+            if item.get("state", "") == "complete":
+                checklist_items += f"+ "
+            else:
+                checklist_items += f"- "
 
-    return [json.dumps(item) for item in checklist_items]
+            checklist_items += item.get("name", "Not found")
+
+            if not item.get("idMember") is None:
+                checklist_items += f" @{get_member_short_code(item.get("idMember"))}"
+
+            checklist_items += "\n"
+
+    checklist_items = checklist_items.rstrip("\n")
+
+    return checklist_items
 
 def get_card_comments(card_id: str):
     return make_api_request(f"card/{card_id}/actions", {
