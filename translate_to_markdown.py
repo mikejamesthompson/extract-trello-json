@@ -16,9 +16,7 @@ def md_to_jira(md: str) -> str:
       • Images (![alt](url) -> !url|alt=alt!)
       • Horizontal rules (--- -> ----)
       • Strikethrough (~~text~~ -> -text-)
-      • Nested lists: Any increase in leading whitespace indicates a new nesting level.
-          Unordered items use repeated asterisks.
-          Ordered items use repeated hash symbols.
+      • Nested lists (ordered and unordered) with dynamic indentation.
 
     Raises:
       ValueError: If tables are detected in the Markdown.
@@ -61,8 +59,11 @@ def md_to_jira(md: str) -> str:
     # Convert inline code: Markdown `code` -> Jira {{code}}
     text = re.sub(r"`(.*?)`", r"{{\1}}", text)
 
-    # Convert blockquotes: Markdown > quote -> Jira bq. quote
-    text = re.sub(r"^>\s?", "bq. ", text, flags=re.MULTILINE)
+    # --- Handle blockquotes ---
+    # First, remove blockquote markers on blank lines (lines that only contain ">" and optionally whitespace).
+    text = re.sub(r"^>\s*$", "", text, flags=re.MULTILINE)
+    # Now convert non-blank blockquote lines.
+    text = re.sub(r"^>\s+", "bq. ", text, flags=re.MULTILINE)
 
     # Convert images: Markdown !alt -> Jira !url|alt=alt!
     text = re.sub(r"!\[([^\]]*)\]\(([^)]+?)\)", r"!\2|alt=\1!", text)
@@ -84,12 +85,11 @@ def md_to_jira(md: str) -> str:
     def convert_list_lines(text: str) -> str:
         lines = text.splitlines()
         new_lines = []
-        # The indent_stack holds the indent level (number of whitespace characters) for
-        # each nesting level.
+        # The indent_stack holds the indent level (number of whitespace characters) for nesting.
         indent_stack = []
 
         for line in lines:
-            # Check if it is an ordered or unordered list item.
+            # Check if the line is an ordered or unordered list item.
             m_ordered = ordered_pattern.match(line)
             m_unordered = unordered_pattern.match(line)
             if m_ordered or m_unordered:
@@ -122,7 +122,7 @@ def md_to_jira(md: str) -> str:
                 level = len(indent_stack)
                 new_lines.append(f"{marker_char * level} {content}")
             else:
-                # Non-list line: reset the indent stack.
+                # Reset stack for non-list lines.
                 indent_stack = []
                 new_lines.append(line)
         return "\n".join(new_lines)
@@ -140,7 +140,9 @@ Some **bold text** and some *italic text* along with ~~strikethrough~~ formattin
 ## Heading 2
 A paragraph with a [link](https://example.com) and inline code: `x = 1`.
 
-> A blockquote
+> childs form is not coming through and she is not appearing on any cohort. Do they just have to wait a bit and maybe catch her on the next session?
+>
+> Manage vaccinations in schools (Mavis) – Manage vaccinations in schools
 
 - Top-level unordered item
  - Nested unordered item
@@ -148,7 +150,7 @@ A paragraph with a [link](https://example.com) and inline code: `x = 1`.
 * Another top-level unordered item
 
 1. First ordered item
-    1. Nested ordered item
+   1. Nested ordered item
       1. Third-level ordered item
 2. Second ordered item
 
@@ -160,6 +162,6 @@ def hello():
 ```
 
 ![Alt text](https://img.shields.io/badge/alt-text-green)
-
 """
+
     print(md_to_jira(md_sample))
