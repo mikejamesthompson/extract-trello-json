@@ -184,8 +184,11 @@ def filter_labels(labels: list[str]) -> list[str]:
 
 def get_card_attachment_urls(card_id: str):
     attachments = make_api_request(f"card/{card_id}/attachments")
-    # [print(type(attachment)) for attachment in attachments]
-    return [attachment.get("url") for attachment in attachments]
+
+    return {
+        "files": [attachment.get("url") for attachment in attachments if attachment.get("isUpload")],
+        "links": [attachment.get("url") for attachment in attachments if not attachment.get("isUpload")]
+    }
 
 def get_attachment_data(attachment_url: str):
     auth_header = {

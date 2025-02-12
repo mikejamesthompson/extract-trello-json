@@ -32,7 +32,9 @@ def create_jira_csv(output_csv_path: str):
         creation_time = utils.get_time_from_id(card.get("id"))
 
         trello_attachments = utils.get_card_attachment_urls(card.get("id"))
-        attachments_local_urls = [utils.save_attachment(attachment, tqdm) for attachment in trello_attachments]
+        trello_files = trello_attachments.get("files")
+        trello_links = trello_attachments.get("links") # TODO add these to the bottom of the description
+        attachments_local_urls = [utils.save_attachment(attachment, tqdm) for attachment in trello_files]
 
         if "bug" in labels:
             issue_type = "Bug"
