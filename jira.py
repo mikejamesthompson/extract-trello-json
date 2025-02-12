@@ -1,6 +1,5 @@
 import argparse
 import utils
-import pandas as pd
 from tqdm import tqdm
 
 
@@ -68,24 +67,8 @@ def create_jira_csv(output_csv_path: str):
         )
 
 
-    ## Write to CSV
-    # Create initial DataFrame
-    df = pd.DataFrame(cards)
-
-    # Find list-type columns
-    list_columns = [col for col in df.columns if isinstance(df[col].iloc[0], list)]
-
-    # Process each list column
-    for col in list_columns:
-        # Find max length for this column
-        max_length = max(len(row) for row in df[col])
-        # Expand the list column
-        expanded = pd.DataFrame(df[col].tolist()).fillna('')
-        expanded.columns = [col] * max_length
-        # Replace original column with expanded version
-        df = pd.concat([df.drop(col, axis=1), expanded], axis=1)
-
-    df.to_csv('output.csv', index=False)
+    # Write to CSV
+        utils.write_to_csv(cards, output_csv_path)
 
 
 if __name__ == "__main__":

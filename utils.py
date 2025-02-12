@@ -4,6 +4,7 @@ import dotenv
 import requests
 import json
 from datetime import datetime
+import pandas as pd
 
 dotenv.load_dotenv()
 
@@ -220,6 +221,25 @@ def save_attachment(attachment_url: str, tqdm=None):
 
 def get_time_from_id(card_id: str):
     return datetime.fromtimestamp(int(card_id[0:8], 16))
+
+def write_to_csv(cards, output_file: str="output.csv"):
+    # Create initial DataFrame
+    df = pd.DataFrame(cards)
+
+    # Find list-type columns
+    list_columns = [col for col in df.columns if isinstance(df[col].iloc[0], list)]
+
+    # Process each list column
+    for col in list_columns:
+        # Find max length for this column
+        max_length = max(len(row) for row in df[col])
+        # Expand the list column
+        expanded = pd.DataFrame(df[col].tolist()).fillna('')
+        expanded.columns = [col] * max_length
+        # Replace original column with expanded version
+        df = pd.concat([df.drop(col, axis=1), expanded], axis=1)
+
+    df.to_csv(output_file, index=False)
 
 
 
