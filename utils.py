@@ -252,6 +252,13 @@ def write_to_csv(cards, output_file: str="output.csv"):
 
     df.to_csv(output_file, index=False)
 
+def add_links_to_description(jira_description: str, links: list[str]):
+    if len(links) == 0:
+        return jira_description
+
+    return jira_description + "\n" + \
+        "h1. Links migrated from Trello\n" + \
+        "* " + "\n* ".join(links)
 
 
 ALL_CUSTOM_FIELDS = get_all_custom_fields()

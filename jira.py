@@ -11,6 +11,7 @@ def create_jira_csv(output_csv_path: str):
     # Exclude archived cards
     all_original_cards = [card for card in all_original_cards if card.get("closed") == False]
 
+    # Restrict cards for testing
     all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [
         1293, # No creator (otherwise also complex), v1.5.0, emojis
         1851, # Good markdown
@@ -44,8 +45,10 @@ def create_jira_csv(output_csv_path: str):
 
         trello_attachments = utils.get_card_attachment_urls(card.get("id"))
         trello_files = trello_attachments.get("files")
-        trello_links = trello_attachments.get("links") # TODO add these to the bottom of the description
         attachments_local_urls = [utils.save_attachment(attachment, tqdm) for attachment in trello_files]
+
+        trello_links = trello_attachments.get("links")
+        description = utils.add_links_to_description(description, trello_links)
 
         if "bug" in labels:
             issue_type = "Bug"
@@ -71,7 +74,7 @@ def create_jira_csv(output_csv_path: str):
                 "trello_id": trello_id,
                 "workaround": workaround,
                 "issue_type": issue_type,
-                "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"], # TODO Refactor cards in trello: herts -> Hertfordshire
+                "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"],
                 "reporter": creator,
                 "date_created": creation_time.isoformat(),
                 "status": status,
