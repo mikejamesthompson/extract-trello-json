@@ -207,8 +207,11 @@ def get_attachment_data(attachment_url: str):
 
     return response.content
 
+def get_local_file_name(attachment_url: str):
+    return attachment_url.removeprefix("https://trello.com/1/").replace("/", "-")
+
 def save_attachment(attachment_url: str, tqdm=None):
-    local_file_name = attachment_url.removeprefix("https://trello.com/1/").replace("/", "-")
+    local_file_name = get_local_file_name(attachment_url)
     file_location = os.path.join(os.getenv("ATTACHMENT_DIRECTORY"), local_file_name)
     local_endpoint = os.path.join(os.getenv('ATTACHMENT_SERVER_ENDPOINT'), local_file_name)
 

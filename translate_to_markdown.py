@@ -69,8 +69,15 @@ def md_to_jira(md: str) -> str:
     # Convert non-blank blockquote lines.
     text = re.sub(r"^>\s+", "bq. ", text, flags=re.MULTILINE)
 
-    # Convert images: Markdown !alt -> Jira !url|alt=alt!
-    text = re.sub(r"!\[([^\]]*)\]\(([^)]+?)\)", r"!\2|alt=\1!", text)
+    # Change image URLs to point at the local version of the image in Jira
+    def replace_image(match):
+        alt_text = match.group(1)
+        original_url = match.group(2)
+        new_url = utils.get_local_file_name(original_url)
+        return f"!{new_url}|width=750!"
+
+    text = re.sub(r"!\[([^\]]*)\]\(([^)]+?)\)", replace_image, text)
+
 
     # Convert links that are not images: Markdown text -> Jira [text|url]
     text = re.sub(r"(?<!\!)\[([^\]]+?)\]\(([^)]+?)\)", r"[\1|\2]", text)
