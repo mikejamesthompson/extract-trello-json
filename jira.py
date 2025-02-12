@@ -8,6 +8,9 @@ def create_jira_csv(output_csv_path: str):
     all_original_cards = utils.get_all_cards()
 
     all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [1992, 1995, 1978, 1842, 1993, 1891, 1781]]
+    # Exclude archived cards
+    all_original_cards = [card for card in all_original_cards if card.get("closed") == False]
+
 
     # Extract bug cards
     cards = []
