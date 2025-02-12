@@ -53,10 +53,10 @@ def create_jira_csv(output_csv_path: str):
                 "trello_id": trello_id, # TODO maybe make this a link instead?
                 "workaround": workaround,
                 "issue_type": issue_type,
-                "labels": utils.filter_labels(labels), # TODO Refactor cards in trello: waiting -> blocked, herts -> Hertfordshire
+                "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"], # TODO Refactor cards in trello: waiting -> blocked, herts -> Hertfordshire
                 "reporter": creator,
                 "date_created": creation_time.isoformat(),
-                "status": utils.get_jira_list_name(column, issue_type),
+                "status": utils.get_jira_list_name(column, issue_type), # TODO check that these aren't spitting out "Not found"
                 "comments": comments,
                 "attachments": attachments,
                 "fix_version": version,
