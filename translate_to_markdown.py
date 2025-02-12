@@ -1,6 +1,8 @@
 import re
 import emoji  # pip install emoji
 
+import utils
+
 
 def md_to_jira(md: str) -> str:
     """
@@ -133,6 +135,16 @@ def md_to_jira(md: str) -> str:
     # This will replace occurrences like :white_check_mark: with the corresponding emoji.
     text = emoji.emojize(text, language="alias")
 
+    # Replace tags
+    def replace_tags(match):
+        trello_username = match.group(1)
+        trello_member_id = utils.get_member_id(trello_username)
+        shortcode = utils.get_member_short_code(trello_member_id)
+        return f"[~{shortcode}]"
+
+    # This pattern matches @ followed by word characters or hyphens.
+    text = re.sub(r"@([\w-]+)", replace_tags, text)
+
     return text
 
 
@@ -140,6 +152,8 @@ def md_to_jira(md: str) -> str:
 if __name__ == "__main__":
     md_sample = """# Heading 1
 Some **bold text** and some *italic text* along with ~~strikethrough~~ formatting.
+
+Hello @alistairwhitehorne1.
 
 ## Heading 2
 A paragraph with a [link](https://example.com) and inline code: `x = 1`. :smile:

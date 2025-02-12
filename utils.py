@@ -62,8 +62,14 @@ def get_all_members():
 
 def get_member_name(member_id: str) -> str:
     for member in ALL_MEMBERS:
-        if member['id'] == member_id:
-            return member['fullName']
+        if member.get('id', '') == member_id:
+            return member.get('fullName', '')
+    return "Not found"
+
+def get_member_id(member_username: str) -> str:
+    for member in ALL_MEMBERS:
+        if member.get('username', '') == member_username:
+            return member.get('id', '')
     return "Not found"
 
 def get_member_short_code(member_id: str) -> str:
@@ -258,6 +264,7 @@ with open('columns_mapping.json', 'r') as f:
 with open('jira_labels.json', 'r') as f:
     JIRA_LABELS = json.load(f)
     JIRA_LABELS_LOWER = [label.lower() for label in JIRA_LABELS]
+
 
 # def extract_cards_since(cards: list[Card], start_date: datetime) -> list[Card]:
 #     return [

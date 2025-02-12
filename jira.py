@@ -33,7 +33,7 @@ def create_jira_csv(output_csv_path: str):
         members = [utils.get_member_short_code(member_id) for member_id in card.get("idMembers", [])] # Need to map these to names or shortcodes
         checklists = utils.get_card_checklists(card.get("id"))
         checklist_items = utils.process_checklists(checklists)
-        trello_id = card.get("idShort", "")
+        trello_id = f"MAVIS-{card.get("idShort", "")}"
         creator = utils.get_member_short_code(utils.get_card_creator(card.get("id")).get("id", ""))
         custom_fields = utils.get_card_custom_fields(card.get("id"))
         workaround = utils.get_section_content_from_markdown(description, "workaround")
@@ -71,7 +71,7 @@ def create_jira_csv(output_csv_path: str):
                 "trello_id": trello_id,
                 "workaround": workaround,
                 "issue_type": issue_type,
-                "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"], # TODO Refactor cards in trello: waiting -> blocked, herts -> Hertfordshire
+                "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"], # TODO Refactor cards in trello: herts -> Hertfordshire
                 "reporter": creator,
                 "date_created": creation_time.isoformat(),
                 "status": status,
