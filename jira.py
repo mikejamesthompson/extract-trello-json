@@ -12,15 +12,17 @@ def create_jira_csv(output_csv_path: str):
     all_original_cards = [card for card in all_original_cards if card.get("closed") == False]
 
     # Restrict cards for testing
-    # all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [
-    #     1293, # No creator (otherwise also complex), v1.5.0, emojis
-    #     1851, # Good markdown
-    #     1933, # Links instead of attachments
-    #     1992, # In done column, ops support
-    #     1995, # Archived
-    #     1891, # Go-live for Herts - checklist
-    #     1792, # Markdown in comments
-    # ]]
+    all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [
+        1293, # No creator (otherwise also complex), v1.5.0, emojis
+        1851, # Good markdown
+        1933, # Links instead of attachments
+        1992, # In done column, ops support
+        1995, # Archived
+        1792, # Markdown in comments
+        1891, # Go-live for Herts - multiple collaborators
+        1929, # Workaround
+
+    ]]
     # all_original_cards = all_original_cards[:100]
 
     # Extract bug cards
@@ -69,6 +71,7 @@ def create_jira_csv(output_csv_path: str):
                 "summary": card.get("name", ""),
                 "description": description,
                 "severity": custom_fields.get("Severity", ""),
+                "component": custom_fields.get("Feature", ""),
                 "assignee": members[0] if len(members) > 0 else "",
                 "collaborators": members[1:],
                 "trello_id": trello_id,
