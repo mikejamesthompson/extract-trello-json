@@ -32,6 +32,8 @@ def create_jira_csv(output_csv_path: str):
 
         labels = [label.get("name", "").lower() for label in card.get("labels", [])]
         description = card.get("desc", "")
+        workaround = utils.get_section_content_from_markdown(description, "workaround")
+        release_notes = utils.get_section_content_from_markdown(description, "release note")
         description = md_to_jira(description)
         members = [utils.get_member_short_code(member_id) for member_id in card.get("idMembers", [])] # Need to map these to names or shortcodes
         checklists = utils.get_card_checklists(card.get("id"))
@@ -39,7 +41,6 @@ def create_jira_csv(output_csv_path: str):
         trello_id = f"MAVIS-{card.get("idShort", "")}"
         creator = utils.get_member_short_code(utils.get_card_creator(card.get("id")).get("id", ""))
         custom_fields = utils.get_card_custom_fields(card.get("id"))
-        workaround = utils.get_section_content_from_markdown(description, "workaround")
         comments = utils.get_card_comments(card.get("id"))
         comments = utils.process_comments(comments)
         column = utils.get_list_name(card.get("idList"))
@@ -76,6 +77,7 @@ def create_jira_csv(output_csv_path: str):
                 "collaborators": members[1:],
                 "trello_id": trello_id,
                 "workaround": workaround,
+                "release_notes": release_notes,
                 "issue_type": issue_type,
                 "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"],
                 "reporter": creator,
