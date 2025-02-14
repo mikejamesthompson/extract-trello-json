@@ -12,17 +12,16 @@ def create_jira_csv(output_csv_path: str):
     all_original_cards = [card for card in all_original_cards if card.get("closed") == False]
 
     # Restrict cards for testing
-    all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [
-        1293, # No creator (otherwise also complex), v1.5.0, emojis
-        1851, # Good markdown
-        1933, # Links instead of attachments
-        1992, # In done column, ops support
-        1995, # Archived
-        1792, # Markdown in comments
-        1891, # Go-live for Herts - multiple collaborators
-        1929, # Workaround
-
-    ]]
+    # all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [
+    #     1293, # No creator (otherwise also complex), v1.5.0, emojis
+    #     1851, # Good markdown
+    #     1933, # Links instead of attachments
+    #     1992, # In done column, ops support
+    #     1995, # Archived
+    #     1792, # Markdown in comments
+    #     1891, # Go-live for Herts - multiple collaborators
+    #     1929, # Workaround
+    # ]]
     # all_original_cards = all_original_cards[:100]
 
     # Extract bug cards
@@ -33,7 +32,9 @@ def create_jira_csv(output_csv_path: str):
         labels = [label.get("name", "").lower() for label in card.get("labels", [])]
         description = card.get("desc", "")
         workaround = utils.get_section_content_from_markdown(description, "workaround")
+        workaround = md_to_jira(workaround)
         release_notes = utils.get_section_content_from_markdown(description, "release note")
+        release_notes = md_to_jira(release_notes)
         description = md_to_jira(description)
         members = [utils.get_member_short_code(member_id) for member_id in card.get("idMembers", [])] # Need to map these to names or shortcodes
         checklists = utils.get_card_checklists(card.get("id"))
@@ -82,7 +83,7 @@ def create_jira_csv(output_csv_path: str):
                 "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"],
                 "reporter": creator,
                 "date_created": creation_time.isoformat(),
-                "status": status,
+                "status": status, # TODO make sure column names are unique
                 "comments": comments,
                 "attachments": attachments_local_urls,
                 "fix_version": version,

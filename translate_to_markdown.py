@@ -190,3 +190,5 @@ def hello():
 """
 
     print(md_to_jira(md_sample))
+
+    print(md_to_jira(""))

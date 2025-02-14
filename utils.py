@@ -9,7 +9,7 @@ from translate_to_markdown import md_to_jira
 
 dotenv.load_dotenv()
 
-def get_section_content_from_markdown(markdown_text: str, header_name: str) -> str | None:
+def get_section_content_from_markdown(markdown_text: str, header_name: str) -> str:
     md = MarkdownIt()
     tokens = md.parse(markdown_text)
 
@@ -39,7 +39,7 @@ def get_section_content_from_markdown(markdown_text: str, header_name: str) -> s
                 content_lines.append(token.content)
 
     if not under_header:
-        return None
+        return ""
 
     return '\n'.join(content_lines).strip()
 
