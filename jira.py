@@ -6,13 +6,13 @@ from translate_to_markdown import md_to_jira
 
 def create_jira_csv(output_csv_path: str):
     # Read the Trello JSON file
-    all_original_cards = utils.get_all_cards()
+    trello_cards = utils.get_all_cards()
 
     # Exclude archived cards
-    all_original_cards = [card for card in all_original_cards if card.get("closed") == False]
+    trello_cards = [card for card in trello_cards if card.get("closed") == False]
 
     # Restrict cards for testing
-    # all_original_cards = [card for card in all_original_cards if card.get("idShort", "") in [
+    # trello_cards = [card for card in trello_cards if card.get("idShort", "") in [
     #     1293, # No creator (otherwise also complex), v1.5.0, emojis
     #     1851, # Good markdown
     #     1933, # Links instead of attachments
@@ -22,11 +22,10 @@ def create_jira_csv(output_csv_path: str):
     #     1891, # Go-live for Herts - multiple collaborators
     #     1929, # Workaround
     # ]]
-    # all_original_cards = all_original_cards[:100]
+    # trello_cards = trello_cards[:100]
 
-    # Extract bug cards
-    cards = []
-    for card in tqdm(all_original_cards):
+    jira_cards = []
+    for card in tqdm(trello_cards):
         tqdm.write(f"Processing card: MAVIS-{card.get("idShort", "")} - {card.get("name", "")}")
 
         labels = [label.get("name", "").lower() for label in card.get("labels", [])]
@@ -68,7 +67,7 @@ def create_jira_csv(output_csv_path: str):
             if label.startswith("v1."):
                 version = label
 
-        cards.append(
+        jira_cards.append(
             {
                 "summary": card.get("name", ""),
                 "description": description,
@@ -93,7 +92,7 @@ def create_jira_csv(output_csv_path: str):
 
 
     # Write to CSV
-        utils.write_to_csv(cards, output_csv_path)
+    utils.write_to_csv(jira_cards, output_csv_path)
 
 
 if __name__ == "__main__":
