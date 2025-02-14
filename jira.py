@@ -2,10 +2,84 @@ import argparse
 import utils
 from tqdm import tqdm
 from translate_to_markdown import md_to_jira
+import concurrent.futures
 
+
+def process_card(card):
+    # Print progress: note that concurrent printing may interleave.
+    tqdm.write(f"Processing card: MAVIS-{card.get('idShort', '')} - {card.get('name', '')}")
+
+    labels = [label.get("name", "").lower() for label in card.get("labels", [])]
+    description = card.get("desc", "")
+    workaround = utils.get_section_content_from_markdown(description, "workaround")
+    workaround = md_to_jira(workaround)
+    release_notes = utils.get_section_content_from_markdown(description, "release note")
+    release_notes = md_to_jira(release_notes)
+    description = md_to_jira(description)
+    members = [utils.get_member_short_code(member_id) for member_id in card.get("idMembers", [])]
+    checklists = utils.get_card_checklists(card.get("id"))
+    checklist_items = utils.process_checklists(checklists)
+    trello_id = f"MAVIS-{card.get("idShort", "")}"
+    creator = utils.get_member_short_code(utils.get_card_creator(card.get("id")).get("id", ""))
+    custom_fields = utils.get_card_custom_fields(card.get("id"))
+    comments = utils.get_card_comments(card.get("id"))
+    comments = utils.process_comments(comments)
+    column = utils.get_list_name(card.get("idList"))
+    creation_time = utils.get_time_from_id(card.get("id"))
+
+    trello_attachments = utils.get_card_attachment_urls(card.get("id"))
+    trello_files = trello_attachments.get("files")
+    attachments_local_urls = [utils.save_attachment(attachment, tqdm) for attachment in trello_files]
+
+    trello_links = trello_attachments.get("links")
+    description = utils.add_links_to_description(description, trello_links)
+
+    if "bug" in labels:
+        issue_type = "Bug"
+    elif "ops" in labels or "ops support" in labels:
+        issue_type = "Support"
+    else:
+        issue_type = "Story"
+
+    status = utils.get_jira_list_name(column, issue_type)
+
+    version = ""
+    for label in labels:
+        if label.startswith("v1."):
+            version = label
+
+    return {
+        "summary": card.get("name", ""),
+        "description": description,
+        "severity": custom_fields.get("Severity", ""),
+        "component": custom_fields.get("Feature", ""),
+        "assignee": members[0] if len(members) > 0 else "",
+        "collaborators": members[1:],
+        "trello_id": trello_id,
+        "workaround": workaround,
+        "release_notes": release_notes,
+        "issue_type": issue_type,
+        "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"],
+        "reporter": creator,
+        "date_created": creation_time.isoformat(),
+        "status": status,
+        "comments": comments,
+        "attachments": attachments_local_urls,
+        "fix_version": version,
+        "checklist_items": checklist_items,
+    }
+
+# Parallelize processing with ThreadPoolExecutor.
+def process_all_cards(trello_cards):
+    jira_cards = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        # executor.map preserves the order of the input list.
+        for result in tqdm(executor.map(process_card, trello_cards), total=len(trello_cards)):
+            jira_cards.append(result)
+    return jira_cards
 
 def create_jira_csv(output_csv_path: str):
-    # Read the Trello JSON file
+    # Get all cards from API
     trello_cards = utils.get_all_cards()
 
     # Exclude archived cards
@@ -24,71 +98,7 @@ def create_jira_csv(output_csv_path: str):
     # ]]
     # trello_cards = trello_cards[:100]
 
-    jira_cards = []
-    for card in tqdm(trello_cards):
-        tqdm.write(f"Processing card: MAVIS-{card.get("idShort", "")} - {card.get("name", "")}")
-
-        labels = [label.get("name", "").lower() for label in card.get("labels", [])]
-        description = card.get("desc", "")
-        workaround = utils.get_section_content_from_markdown(description, "workaround")
-        workaround = md_to_jira(workaround)
-        release_notes = utils.get_section_content_from_markdown(description, "release note")
-        release_notes = md_to_jira(release_notes)
-        description = md_to_jira(description)
-        members = [utils.get_member_short_code(member_id) for member_id in card.get("idMembers", [])] # Need to map these to names or shortcodes
-        checklists = utils.get_card_checklists(card.get("id"))
-        checklist_items = utils.process_checklists(checklists)
-        trello_id = f"MAVIS-{card.get("idShort", "")}"
-        creator = utils.get_member_short_code(utils.get_card_creator(card.get("id")).get("id", ""))
-        custom_fields = utils.get_card_custom_fields(card.get("id"))
-        comments = utils.get_card_comments(card.get("id"))
-        comments = utils.process_comments(comments)
-        column = utils.get_list_name(card.get("idList"))
-        creation_time = utils.get_time_from_id(card.get("id"))
-
-        trello_attachments = utils.get_card_attachment_urls(card.get("id"))
-        trello_files = trello_attachments.get("files")
-        attachments_local_urls = [utils.save_attachment(attachment, tqdm) for attachment in trello_files]
-
-        trello_links = trello_attachments.get("links")
-        description = utils.add_links_to_description(description, trello_links)
-
-        if "bug" in labels:
-            issue_type = "Bug"
-        elif "ops" in labels or "ops support" in labels:
-            issue_type = "Support"
-        else:
-            issue_type = "Story"
-
-        status = utils.get_jira_list_name(column, issue_type)
-
-        version = ""
-        for label in labels:
-            if label.startswith("v1."):
-                version = label
-
-        jira_cards.append(
-            {
-                "summary": card.get("name", ""),
-                "description": description,
-                "severity": custom_fields.get("Severity", ""),
-                "component": custom_fields.get("Feature", ""),
-                "assignee": members[0] if len(members) > 0 else "",
-                "collaborators": members[1:],
-                "trello_id": trello_id,
-                "workaround": workaround,
-                "release_notes": release_notes,
-                "issue_type": issue_type,
-                "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"],
-                "reporter": creator,
-                "date_created": creation_time.isoformat(),
-                "status": status,
-                "comments": comments,
-                "attachments": attachments_local_urls,
-                "fix_version": version,
-                "checklist_items": checklist_items,
-            }
-        )
+    jira_cards = process_all_cards(trello_cards)
 
 
     # Write to CSV

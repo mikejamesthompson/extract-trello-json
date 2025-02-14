@@ -6,8 +6,14 @@ import json
 from datetime import datetime
 import pandas as pd
 from translate_to_markdown import md_to_jira
+from ratelimit import limits, sleep_and_retry
+from tenacity import retry, wait_fixed, stop_after_attempt, retry_if_exception
 
 dotenv.load_dotenv()
+
+# START_TIME = datetime.now()
+# API_REQUEST_COUNT = 0
+
 
 def get_section_content_from_markdown(markdown_text: str, header_name: str) -> str:
     md = MarkdownIt()
@@ -43,16 +49,45 @@ def get_section_content_from_markdown(markdown_text: str, header_name: str) -> s
 
     return '\n'.join(content_lines).strip()
 
+def retry_if_429(exception):
+    if isinstance(exception, requests.exceptions.HTTPError):
+        if exception.response.status_code == 429:
+            print("----- ERROR: API rate limit exceeded, backing off for 3 secs -----")
+            return True
+    return False
+
+@sleep_and_retry
+@limits(calls=90, period=10)          # Trello rate limit is 100 requests per 10 secs
+@retry(wait=wait_fixed(3),
+       stop=stop_after_attempt(5),
+       retry=retry_if_exception(retry_if_429))
+def make_generic_request(url, params: dict[str, any]={}, headers: dict[str, str]={}):
+    response = requests.get(url, params=params, headers=headers)
+    response.raise_for_status()
+
+    # global API_REQUEST_COUNT
+    # API_REQUEST_COUNT += 1
+    # print(f"Requests per second: {API_REQUEST_COUNT/ (datetime.now() - START_TIME).total_seconds()}")
+
+    return response
+
 def make_api_request(url_extension: str, params: dict={}) -> any:
     url = f"https://api.trello.com/1/{url_extension}"
     authorised_params = params | {
         "key": os.getenv('TRELLO_API_KEY'),
         "token": os.getenv('TRELLO_TOKEN')
     }
-    response = requests.get(url, params=authorised_params)
-    response.raise_for_status()
+    response = make_generic_request(url, params=authorised_params)
 
     return response.json()
+
+def get_attachment_data(attachment_url: str):
+    auth_header = {
+        "Authorization": f"OAuth oauth_consumer_key=\"{os.getenv('TRELLO_API_KEY')}\", oauth_token=\"{os.getenv('TRELLO_TOKEN')}\""
+    }
+    response = make_generic_request(attachment_url, headers=auth_header)
+
+    return response.content
 
 def get_all_cards():
     return make_api_request(f"board/{os.getenv('TRELLO_BOARD_ID')}/cards")
@@ -198,15 +233,6 @@ def get_card_attachment_urls(card_id: str):
         "links": [attachment.get("url") for attachment in attachments if not attachment.get("isUpload")]
     }
 
-def get_attachment_data(attachment_url: str):
-    auth_header = {
-        "Authorization": f"OAuth oauth_consumer_key=\"{os.getenv('TRELLO_API_KEY')}\", oauth_token=\"{os.getenv('TRELLO_TOKEN')}\""
-    }
-    response = requests.get(attachment_url, headers=auth_header)
-    response.raise_for_status()
-
-    return response.content
-
 def get_local_file_name(attachment_url: str):
     return attachment_url.removeprefix("https://trello.com/1/").replace("/", "-")
 
@@ -269,7 +295,7 @@ ALL_MEMBERS = get_all_members()
 with open('members_mapping.json', 'r') as f:
     MEMBERS_MAPPING = json.load(f)
 ALL_LISTS = get_all_lists()
-with open('columns_mapping.json', 'r') as f:
+with open('columns_mapping_real.json', 'r') as f:
     COLUMNS_MAPPING = json.load(f)
 with open('jira_labels.json', 'r') as f:
     JIRA_LABELS = json.load(f)
