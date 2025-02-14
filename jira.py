@@ -83,7 +83,7 @@ def create_jira_csv(output_csv_path: str):
                 "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"],
                 "reporter": creator,
                 "date_created": creation_time.isoformat(),
-                "status": status, # TODO make sure column names are unique
+                "status": status,
                 "comments": comments,
                 "attachments": attachments_local_urls,
                 "fix_version": version,

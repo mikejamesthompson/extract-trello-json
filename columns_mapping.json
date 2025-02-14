@@ -1,54 +1,58 @@
 {
   "User Needs": {},
-  "Bug triage 🐛": {},
-  "Prioritised backlog": {},
+  "Bug triage 🐛": {
+    "Bug": "Bug: INVESTIGATING"
+  },
+  "Prioritised backlog": {
+    "Bug": "Bug: READY FOR FIX"
+  },
   "Next ⏭️": {
-    "Story": "NEXT"
+    "Story": "Story: NEXT"
   },
   "In progress 👩\u200d💻": {
-    "Bug": "INVESTIGATING",
-    "Story": "IN PROGRESS",
-    "Support": "IN PROGRESS"
+    "Bug": "Bug: INVESTIGATING",
+    "Story": "Story: IN PROGRESS",
+    "Support": "Support: IN PROGRESS"
   },
   "In review 🕵️": {
-    "Bug": "INVESTIGATING",
-    "Story": "IN REVIEW",
-    "Support": "IN REVIEW"
+    "Bug": "Bug: INVESTIGATING",
+    "Story": "Story: IN REVIEW",
+    "Support": "Support: IN REVIEW"
   },
   "Doubles design: In progress": {
-    "Bug": "INVESTIGATING",
-    "Story": "IN PROGRESS",
-    "Support": "IN PROGRESS"
+    "Bug": "Bug: INVESTIGATING",
+    "Story": "Story: IN PROGRESS",
+    "Support": "Support: IN PROGRESS"
   },
   "Doubles design: For review": {
-    "Bug": "INVESTIGATING",
-    "Story": "IN REVIEW",
-    "Support": "IN REVIEW"
+    "Bug": "Bug: INVESTIGATING",
+    "Story": "Story: IN REVIEW",
+    "Support": "Support: IN REVIEW"
   },
   "In documentation 📄": {
-    "Bug": "INVESTIGATING",
-    "Story": "IN DOCUMENTATION",
-    "Support": "IN PROGRESS"
+    "Bug": "Bug: INVESTIGATING",
+    "Story": "Story: IN DOCUMENTATION",
+    "Support": "Support: IN PROGRESS"
   },
   "To demo 🚀": {
-    "Bug": "READY FOR FIX",
-    "Story": "TO DEMO",
-    "Support": "IN REVIEW"
+    "Bug": "Bug: READY FOR FIX",
+    "Story": "Story: TO DEMO",
+    "Support": "Support: IN REVIEW"
   },
   "In test": {
-    "Bug": "READY FOR FIX",
-    "Story": "IN TEST",
-    "Support": "IN REVIEW"
+    "Bug": "Bug: READY FOR FIX",
+    "Story": "Story: IN TEST",
+    "Support": "Support: IN REVIEW"
   },
   "Waiting for release": {
-    "Bug": "READY FOR FIX",
-    "Story": "WAITING FOR RELEASE",
-    "Support": "IN REVIEW"
+    "Bug": "Bug: READY FOR FIX",
+    "Story": "Story: WAITING FOR RELEASE",
+    "Support": "Support: IN REVIEW"
   },
   "Done 🎉": {
-    "Bug": "FIXED",
-    "Story": "DONE",
-    "Support": "DONE"
+    "Bug": "Bug: FIXED",
+    "Story": "Story: DONE",
+    "Support": "Support: DONE"
   },
   "Setup & configuration": {},
   "Manage patients & cohorts": {},
@@ -68,8 +72,8 @@
   "Not now": {},
   "Housekeeping": {},
   "default_column": {
-    "Bug": "NEW",
-    "Story": "Backlog",
-    "Support": "NEW"
+    "Bug": "Bug: Backlog",
+    "Story": "Story: Backlog",
+    "Support": "Support: NEW"
   }
 }
