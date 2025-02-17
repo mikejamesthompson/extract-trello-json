@@ -21,7 +21,7 @@
   },
   "Doubles design: In progress": {
     "Bug": "Selected for development",
-    "Story": "In progress",
+    "Story": "In Progress",
     "Support": "In Progress"
   },
   "Doubles design: For review": {
@@ -31,12 +31,12 @@
   },
   "In documentation 📄": {
     "Bug": "Selected for development",
-    "Story": "In Documentation",
+    "Story": "Documentation",
     "Support": "In Progress"
   },
   "To demo 🚀": {
     "Bug": "In Progress",
-    "Story": "To Demo",
+    "Story": "Demo",
     "Support": "In Review"
   },
   "In test": {
