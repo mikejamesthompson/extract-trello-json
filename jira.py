@@ -3,6 +3,7 @@ import utils
 from tqdm import tqdm
 from translate_to_markdown import md_to_jira
 import concurrent.futures
+import re
 
 
 def process_card(card):
@@ -45,7 +46,7 @@ def process_card(card):
 
     version = ""
     for label in labels:
-        if label.startswith("v1."):
+        if re.match(r'^v\d+\.\d+\.\d+$', label): # Matches vX.X.X where X is some integer
             version = label
 
     return {
