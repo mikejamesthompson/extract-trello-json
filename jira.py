@@ -73,7 +73,7 @@ def process_card(card):
 # Parallelize processing with ThreadPoolExecutor.
 def process_all_cards(trello_cards):
     jira_cards = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         # executor.map preserves the order of the input list.
         for result in tqdm(executor.map(process_card, trello_cards), total=len(trello_cards)):
             jira_cards.append(result)
