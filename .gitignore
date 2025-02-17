@@ -1,7 +1,15 @@
 *.json
+!columns_mapping.json
+!jira_labels.json
+!*_example*
+
 *.csv
 
 .idea
 .venv
 
 mise*
+
+.env
+__pycache__
+attachments

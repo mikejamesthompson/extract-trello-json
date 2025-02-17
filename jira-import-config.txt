@@ -1,0 +1,53 @@
+{
+  "config.version" : "2.0",
+  "config.project.from.csv" : "false",
+  "config.encoding" : "UTF-8",
+  "config.email.suffix" : "@",
+  "config.field.mappings" : {
+    "summary" : {
+      "jira.field" : "summary"
+    },
+    "severity" : {
+      "existing.custom.field" : "14364"
+    },
+    "issue_type" : {
+      "jira.field" : "issuetype"
+    },
+    "description" : {
+      "jira.field" : "description"
+    },
+    "fix_version" : {
+      "jira.field" : "fixVersions"
+    },
+    "collaborators" : {
+      "existing.custom.field" : "15913"
+    },
+    "reporter" : {
+      "jira.field" : "reporter"
+    },
+    "assignee" : {
+      "jira.field" : "assignee"
+    },
+    "trello_id" : {
+      "existing.custom.field" : "10602"
+    },
+    "workaround" : {
+      "existing.custom.field" : "10564"
+    },
+    "labels" : {
+      "jira.field" : "labels"
+    }
+  },
+  "config.value.mappings" : { },
+  "config.delimiter" : ",",
+  "config.project" : {
+    "project.type" : null,
+    "project.key" : "MAV",
+    "project.description" : null,
+    "project.url" : null,
+    "project.name" : "Mavis",
+    "project.lead" : "MITH9"
+  },
+  "config.date.format" : "yyyy-MM-dd'T'HH:mm:ss",
+  "config.create.and.assign.default.project.role" : "false"
+}
