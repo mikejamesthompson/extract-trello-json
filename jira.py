@@ -10,6 +10,7 @@ def process_card(card):
     # Print progress: note that concurrent printing may interleave.
     tqdm.write(f"Processing card: MAVIS-{card.get('idShort', '')} - {card.get('name', '')}")
 
+    summary = card.get("name", "")
     labels = [label.get("name", "").lower() for label in card.get("labels", [])]
     description = card.get("desc", "")
     workaround = utils.get_section_content_from_markdown(description, "workaround")
@@ -23,10 +24,13 @@ def process_card(card):
     trello_id = f"MAVIS-{card.get("idShort", "")}"
     creator = utils.get_member_short_code(utils.get_card_creator(card.get("id")).get("id", ""))
     custom_fields = utils.get_card_custom_fields(card.get("id"))
+    severity = custom_fields.get("Severity", "")
+    component = custom_fields.get("Feature", "")
     comments = utils.get_card_comments(card.get("id"))
     comments = utils.process_comments(comments)
     column = utils.get_list_name(card.get("idList"))
     creation_time = utils.get_time_from_id(card.get("id"))
+    jira_labels = utils.filter_labels(labels) + ["Migrated-from-Trello"]
 
     trello_attachments = utils.get_card_attachment_urls(card.get("id"))
     trello_files = trello_attachments.get("files")
@@ -50,17 +54,18 @@ def process_card(card):
             version = label
 
     return {
-        "summary": card.get("name", ""),
+        "summary": summary,
         "description": description,
-        "severity": custom_fields.get("Severity", ""),
-        "component": custom_fields.get("Feature", ""),
+        "severity": severity,
+        "priority": severity,
+        "component": component,
         "assignee": members[0] if len(members) > 0 else "",
         "collaborators": members[1:],
         "trello_id": trello_id,
         "workaround": workaround,
         "release_notes": release_notes,
         "issue_type": issue_type,
-        "labels": utils.filter_labels(labels) + ["Migrated-from-Trello"],
+        "labels": jira_labels,
         "reporter": creator,
         "date_created": creation_time.isoformat(),
         "status": status,
