@@ -1,0 +1,79 @@
+{
+  "User Needs": {},
+  "Bug triage 🐛": {
+    "Bug": "Backlog"
+  },
+  "Prioritised backlog": {
+    "Bug": "In Progress"
+  },
+  "Next ⏭️": {
+    "Story": "Next"
+  },
+  "In progress 👩\u200d💻": {
+    "Bug": "Selected for development",
+    "Story": "In Progress",
+    "Support": "In Progress"
+  },
+  "In review 🕵️": {
+    "Bug": "Selected for development",
+    "Story": "In Review",
+    "Support": "In Review"
+  },
+  "Doubles design: In progress": {
+    "Bug": "Selected for development",
+    "Story": "In progress",
+    "Support": "In Progress"
+  },
+  "Doubles design: For review": {
+    "Bug": "Selected for development",
+    "Story": "In Review",
+    "Support": "In Review"
+  },
+  "In documentation 📄": {
+    "Bug": "Selected for development",
+    "Story": "In Documentation",
+    "Support": "In Progress"
+  },
+  "To demo 🚀": {
+    "Bug": "In Progress",
+    "Story": "To Demo",
+    "Support": "In Review"
+  },
+  "In test": {
+    "Bug": "In Progress",
+    "Story": "In Test",
+    "Support": "In Review"
+  },
+  "Waiting for release": {
+    "Bug": "In Progress",
+    "Story": "Ready to release",
+    "Support": "In Review"
+  },
+  "Done 🎉": {
+    "Bug": "Done",
+    "Story": "Done",
+    "Support": "Done"
+  },
+  "Setup & configuration": {},
+  "Manage patients & cohorts": {},
+  "Schedule sessions & clinics": {},
+  "Get a consent request & Give or refuse digital consent": {},
+  "Verbal, paper, self consent": {},
+  "Triage consent responses": {},
+  "Record vaccinations & manage vaccines": {},
+  "Report vaccinations": {},
+  "Care Identity integration": {},
+  "PDS integration": {},
+  "Cyber, NFR, monitoring": {},
+  "Clinical assurance": {},
+  "Legal, commercial and IG": {},
+  "Ops, support and onboarding": {},
+  "Tech work / tech debt": {},
+  "Not now": {},
+  "Housekeeping": {},
+  "default_column": {
+    "Bug": "Backlog",
+    "Story": "Backlog",
+    "Support": "To do"
+  }
+}
