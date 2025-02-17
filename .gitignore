@@ -1,6 +1,7 @@
 *.json
-!columns_mapping_real.json
+!columns_mapping.json
 !jira_labels.json
+!*_example*
 
 *.csv
 

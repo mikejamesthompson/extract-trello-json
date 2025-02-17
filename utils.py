@@ -296,7 +296,7 @@ ALL_MEMBERS = get_all_members()
 with open('members_mapping.json', 'r') as f:
     MEMBERS_MAPPING = json.load(f)
 ALL_LISTS = get_all_lists()
-with open('columns_mapping_real.json', 'r') as f:
+with open('columns_mapping.json', 'r') as f:
     COLUMNS_MAPPING = json.load(f)
 with open('jira_labels.json', 'r') as f:
     JIRA_LABELS = json.load(f)

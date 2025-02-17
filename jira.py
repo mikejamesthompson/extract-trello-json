@@ -24,7 +24,7 @@ def process_card(card):
     trello_id = f"MAVIS-{card.get("idShort", "")}"
     creator = utils.get_member_short_code(utils.get_card_creator(card.get("id")).get("id", ""))
     custom_fields = utils.get_card_custom_fields(card.get("id"))
-    severity = custom_fields.get("Severity", "")
+    severity = custom_fields.get("Severity", "") # TODO this doesn't check for cards which have "valid" values for Jira
     component = custom_fields.get("Feature", "")
     comments = utils.get_card_comments(card.get("id"))
     comments = utils.process_comments(comments)
@@ -46,7 +46,7 @@ def process_card(card):
     else:
         issue_type = "Story"
 
-    status = utils.get_jira_list_name(column, issue_type)
+    status = utils.get_jira_list_name(column, issue_type) # TODO if the status is "Done" then it needs to have the "resolution" field populated with some value (I don't know what this value should be)
 
     version = ""
     for label in labels:
