@@ -241,6 +241,9 @@ def save_attachment(attachment_url: str, tqdm=None):
     file_location = os.path.join(os.getenv("ATTACHMENT_DIRECTORY"), local_file_name)
     local_endpoint = os.path.join(os.getenv('ATTACHMENT_SERVER_ENDPOINT'), local_file_name)
 
+    if tqdm is not None:
+        tqdm.write(f"\tSaving attachment to {file_location}")
+
     # Ensure the attachments directory exists.
     os.makedirs(os.getenv("ATTACHMENT_DIRECTORY"), exist_ok=True)
 
@@ -254,8 +257,6 @@ def save_attachment(attachment_url: str, tqdm=None):
 
     with open(file_location, "wb") as f:
         f.write(image_data)
-    if tqdm is not None:
-        tqdm.write(f"\tSaved attachment to {file_location}")
 
     return local_endpoint
 
